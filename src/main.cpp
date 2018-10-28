@@ -32,10 +32,10 @@ unsigned long keysLastDebounce[ROWS][COLS] = {
 
 unsigned long debounceDelay = 50;
 
-byte rows[] = {A5, A4, A3, A2};
+byte rows[] = {A5, A3, A4, A2};
 const int rowCount = sizeof(rows) / sizeof(rows[0]);
 
-byte cols[] = {1, 0, 2, 3};
+byte cols[] = {1, 2, 0, 3};
 const int colCount = sizeof(cols) / sizeof(cols[0]);
 
 byte keys[colCount][rowCount];
@@ -121,11 +121,11 @@ void printDirect()
 
                         if (keysValue[colIndex][rowIndex] == LOW)
                         {
-                            // Serial.print("Col: ");
-                            // Serial.println(colIndex);
-                            // Serial.print("Row: ");
-                            // Serial.println(rowIndex);
-                            // Serial.println("");
+                            Serial.print("Col: ");
+                            Serial.println(colIndex);
+                            Serial.print("Row: ");
+                            Serial.println(rowIndex);
+                            Serial.println("");
                             Serial.println(keysMapping[colIndex][rowIndex]);
                         }
                     }

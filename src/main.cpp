@@ -4,11 +4,10 @@ const byte ROWS = 4;
 const byte COLS = 4;
 
 char keysMapping[ROWS][COLS] = {
-    {'A', 'B', 'C', 'D'},
-    {'E', 'F', 'G', 'H'},
-    {'I', 'J', 'K', 'L'},
-    {'M', 'N', 'O', 'P'}
-};
+    {'P', 'L', 'H', 'D'},
+    {'O', 'K', 'G', 'C'},
+    {'N', 'J', 'F', 'B'},
+    {'M', 'I', 'E', 'A'}};
 
 int keysLastValue[ROWS][COLS] = {
     {HIGH, HIGH, HIGH, HIGH},
@@ -32,11 +31,11 @@ unsigned long keysLastDebounce[ROWS][COLS] = {
 
 unsigned long debounceDelay = 50;
 
-byte rows[] = {A5, A3, A4, A2};
-const int rowCount = sizeof(rows) / sizeof(rows[0]);
+byte cols[] = {A5, A4, A3, A2};
+const int rowCount = sizeof(cols) / sizeof(cols[0]);
 
-byte cols[] = {1, 2, 0, 3};
-const int colCount = sizeof(cols) / sizeof(cols[0]);
+byte rows[] = {1, 0, 2, 3};
+const int colCount = sizeof(rows) / sizeof(rows[0]);
 
 byte keys[colCount][rowCount];
 
@@ -51,28 +50,47 @@ void setup()
 
     for (int x = 0; x < colCount; x++)
     {
-        pinMode(cols[x], INPUT_PULLUP);
+        pinMode(cols[x], INPUT);
     }
 }
 
 void readMatrix()
 {
-    for (int colIndex = 0; colIndex < colCount; colIndex++)
+    for (int rowIndex = 0; rowIndex < rowCount; rowIndex++)
     {
-        byte curCol = cols[colIndex];
-        pinMode(curCol, OUTPUT);
-        digitalWrite(curCol, LOW);
+        byte curRow = rows[rowIndex];
+        pinMode(curRow, OUTPUT);
+        digitalWrite(curRow, LOW);
 
-        for (int rowIndex = 0; rowIndex < rowCount; rowIndex++)
+#ifdef DEBUG_MATRIX
+        Serial.print("row ");
+        Serial.print(rowIndex+1);
+        Serial.print("|");
+        Serial.println(curRow);
+#endif
+
+        for (int colIndex = 0; colIndex < colCount; colIndex++)
         {
-            byte rowCol = rows[rowIndex];
-            pinMode(rowCol, INPUT_PULLUP);
-            keys[colIndex][rowIndex] = digitalRead(rowCol);
-            pinMode(rowCol, INPUT);
+            byte curCol = cols[colIndex];
+            pinMode(curCol, INPUT_PULLUP);
+            keys[rowIndex][colIndex] = digitalRead(curCol);
+            pinMode(curCol, INPUT);
+
+#ifdef DEBUG_MATRIX
+            Serial.print("col ");
+            Serial.print(colIndex+1);
+            Serial.print("|");
+            Serial.print(curCol);
+            Serial.print("|");
+            Serial.println(digitalRead(curCol));
+#endif
         }
 
-        pinMode(curCol, INPUT);
+        pinMode(curRow, INPUT_PULLUP);
     }
+#ifdef DEBUG_MATRIX
+    delay(5000);
+#endif
 }
 
 void printMatrix()
@@ -88,7 +106,7 @@ void printMatrix()
 
         for (int colIndex = 0; colIndex < colCount; colIndex++)
         {
-            Serial.print(keys[colIndex][rowIndex]);
+            Serial.print(keys[rowIndex][colIndex]);
             if (colIndex < colCount) {
                 Serial.print(F(", "));
             }
@@ -104,35 +122,37 @@ void printDirect()
     {
         for (int colIndex = 0; colIndex < colCount; colIndex++)
         {
-            if (keys[colIndex][rowIndex] == LOW)
+            if (keys[rowIndex][colIndex] == LOW)
             {
-                if (keys[colIndex][rowIndex] != keysLastValue[colIndex][rowIndex])
+                if (keys[rowIndex][colIndex] != keysLastValue[rowIndex][colIndex])
                 {
                     // reset the debouncing timer
-                    keysLastDebounce[colIndex][rowIndex] = millis();
-                    keysLastValue[colIndex][rowIndex] = keys[colIndex][rowIndex];
+                    keysLastDebounce[rowIndex][colIndex] = millis();
+                    keysLastValue[rowIndex][colIndex] = keys[rowIndex][colIndex];
                 }
 
-                if ((millis() - keysLastDebounce[colIndex][rowIndex]) > debounceDelay)
+                if ((millis() - keysLastDebounce[rowIndex][colIndex]) > debounceDelay)
                 {
-                    if (keys[colIndex][rowIndex] != keysValue[colIndex][rowIndex])
+                    if (keys[rowIndex][colIndex] != keysValue[rowIndex][colIndex])
                     {
-                        keysValue[colIndex][rowIndex] = keys[colIndex][rowIndex];
+                        keysValue[rowIndex][colIndex] = keys[rowIndex][colIndex];
 
-                        if (keysValue[colIndex][rowIndex] == LOW)
+                        if (keysValue[rowIndex][colIndex] == LOW)
                         {
+#ifdef DEBUG_KEY
                             Serial.print("Col: ");
-                            Serial.println(colIndex);
+                            Serial.println(colIndex+1);
                             Serial.print("Row: ");
-                            Serial.println(rowIndex);
+                            Serial.println(rowIndex+1);
                             Serial.println("");
-                            Serial.println(keysMapping[colIndex][rowIndex]);
+#endif
+                            Serial.println(keysMapping[rowIndex][colIndex]);
                         }
                     }
                 }
             } else {
-                keysLastValue[colIndex][rowIndex] = keys[colIndex][rowIndex];
-                keysValue[colIndex][rowIndex] = keys[colIndex][rowIndex];
+                keysLastValue[rowIndex][colIndex] = keys[rowIndex][colIndex];
+                keysValue[rowIndex][colIndex] = keys[rowIndex][colIndex];
             }
         }
     }

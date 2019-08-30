@@ -52,6 +52,8 @@ void setup()
     {
         pinMode(cols[x], INPUT);
     }
+    pinMode(9, OUTPUT);
+    pinMode(10, OUTPUT);
 }
 
 void readMatrix()
@@ -165,4 +167,12 @@ void loop()
         printMatrix();
     }
     printDirect();
+    // digitalWrite(9, HIGH);
+    // delay(1000);
+    // digitalWrite(9, LOW);
+    // delay(1000);
+    // digitalWrite(10, HIGH);
+    // delay(1000);
+    // digitalWrite(10, LOW);
+    // delay(1000);
 }

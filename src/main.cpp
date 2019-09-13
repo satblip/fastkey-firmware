@@ -31,24 +31,34 @@ unsigned long keysLastDebounce[ROWS][COLS] = {
 
 unsigned long debounceDelay = 50;
 
-byte cols[] = {A5, A4, A3, A2};
-const int rowCount = sizeof(cols) / sizeof(cols[0]);
+byte rows[] = {
+  D1,
+  D0,
+  D18,
+  D19
+};
+const int rowsCount = sizeof(rows) / sizeof(rows[0]);
 
-byte rows[] = {1, 0, 2, 3};
-const int colCount = sizeof(rows) / sizeof(rows[0]);
+byte cols[] = {
+  A7,
+  A6,
+  A3,
+  A2
+};
+const int colsCount = sizeof(cols) / sizeof(cols[0]);
 
-byte keys[colCount][rowCount];
+byte keys[colsCount][rowsCount];
 
 void setup()
 {
     Serial.begin(115200);
 
-    for (int x = 0; x < rowCount; x++)
+    for (int x = 0; x < rowsCount; x++)
     {
         pinMode(rows[x], INPUT);
     }
 
-    for (int x = 0; x < colCount; x++)
+    for (int x = 0; x < colsCount; x++)
     {
         pinMode(cols[x], INPUT);
     }
@@ -58,7 +68,7 @@ void setup()
 
 void readMatrix()
 {
-    for (int rowIndex = 0; rowIndex < rowCount; rowIndex++)
+    for (int rowIndex = 0; rowIndex < rowsCount; rowIndex++)
     {
         byte curRow = rows[rowIndex];
         pinMode(curRow, OUTPUT);
@@ -71,7 +81,7 @@ void readMatrix()
         Serial.println(curRow);
 #endif
 
-        for (int colIndex = 0; colIndex < colCount; colIndex++)
+        for (int colIndex = 0; colIndex < colsCount; colIndex++)
         {
             byte curCol = cols[colIndex];
             pinMode(curCol, INPUT_PULLUP);
@@ -97,7 +107,7 @@ void readMatrix()
 
 void printMatrix()
 {
-    for (int rowIndex = 0; rowIndex < rowCount; rowIndex++)
+    for (int rowIndex = 0; rowIndex < rowsCount; rowIndex++)
     {
         if (rowIndex < 10) {
             Serial.print(F("0"));
@@ -106,10 +116,10 @@ void printMatrix()
         Serial.print(rowIndex);
         Serial.print(F(": "));
 
-        for (int colIndex = 0; colIndex < colCount; colIndex++)
+        for (int colIndex = 0; colIndex < colsCount; colIndex++)
         {
             Serial.print(keys[rowIndex][colIndex]);
-            if (colIndex < colCount) {
+            if (colIndex < colsCount) {
                 Serial.print(F(", "));
             }
         }
@@ -120,9 +130,9 @@ void printMatrix()
 
 void printDirect()
 {
-    for (int rowIndex = 0; rowIndex < rowCount; rowIndex++)
+    for (int rowIndex = 0; rowIndex < rowsCount; rowIndex++)
     {
-        for (int colIndex = 0; colIndex < colCount; colIndex++)
+        for (int colIndex = 0; colIndex < colsCount; colIndex++)
         {
             if (keys[rowIndex][colIndex] == LOW)
             {
